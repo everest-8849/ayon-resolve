@@ -136,6 +136,31 @@ class LoaderPluginsModel(BaseSettingsModel):
         title="Load Media"
     )
 
+class FFmpegSettingsModel(BaseSettingsModel):
+    ffmpeg_path_win: str = SettingsField(
+        "ffmpeg_win",
+        title="Win executable path",
+    )
+    ffmpeg_path_mac: str = SettingsField(
+        "ffmpeg_mac",
+        title="Mac executable path",
+    )
+
+
+class TemplatedWorkfileModel(BaseSettingsModel):
+    create_first_version: bool = SettingsField(
+        True,
+        title="Create first workfile",
+        description="Create first workfile version on Resolve startup."
+    )
+    win_template_path: str = SettingsField(
+        title="Win template path",
+        description="Path to the workfile template.",
+    )
+    mac_template_path: str = SettingsField(
+        title="Mac template path",
+        description="Path to the workfile template.",
+    )
 
 class ResolveSettings(BaseSettingsModel):
     launch_ayon_menu_on_start: bool = SettingsField(
@@ -155,6 +180,14 @@ class ResolveSettings(BaseSettingsModel):
     load: LoaderPluginsModel = SettingsField(
         default_factory=LoaderPluginsModel,
         title="Loader plugins",
+    )
+    ffmpeg: FFmpegSettingsModel = SettingsField(
+        default_factory=FFmpegSettingsModel,
+        title="FFmpeg settings"
+    )
+    templated_workfile: TemplatedWorkfileModel = SettingsField(
+        default_factory=TemplatedWorkfileModel,
+        title="Templated Workfile Settings"
     )
 
 
@@ -208,5 +241,10 @@ DEFAULT_VALUES = {
                 }
             ]
         }
+    },
+        "templated_workfile": {
+        "create_first_version": True,
+        "win_template_path": "X:\\SOFTWARE\\AYON\\TEMPLATES\\RESOLVE\\AYON_BREAKDOWN_TEMPLATE.drp",
+        "mac_template_path": "/mount/assets/AYON/TEMPLATES/RESOLVE/AYON_BREAKDOWN_TEMPLATE.drp"
     }
 }

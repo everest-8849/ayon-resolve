@@ -62,7 +62,40 @@ def main():
         log.info(f"Opening last workfile: {workfile_path}")
         open_workfile(workfile_path)
     else:
-        log.info("No last workfile set to open. Skipping..")
+        log.info("No last workfile set to open.")
+        if settings.get("resolve", {}).get("templated_workfile", {}).get("create_first_version", False):
+            log.info("Creating first workfile version on startup.")
+
+            curr_os = sys.platform
+            if curr_os == "win32" or curr_os == "cygwin":
+                template_path = settings.get("resolve", {}).get("templated_workfile", {}).get("win_template_path", "")
+            elif curr_os == "darwin":
+                template_path = settings.get("resolve", {}).get("templated_workfile", {}).get("mac_template_path", "")
+            else:
+                log.warning(f"Unsupported OS: {curr_os}. Cannot create workfile from template.")
+
+            log.info(f"Using template path: {template_path}")
+
+            workfile_path = os.environ.get("AYON_LAST_WORKFILE")
+            
+            if not workfile_path:
+                log.warning("AYON_LAST_WORKFILE environment variable not set. Cannot create workfile from template.")
+            else:
+                workfile_path_dir = os.path.dirname(workfile_path)
+
+                if template_path and os.path.exists(template_path):
+                    try:
+                        os.makedirs(workfile_path_dir, exist_ok=True)
+                        
+                        template_copy = shutil.copy(template_path, workfile_path_dir)
+                        os.rename(template_copy, workfile_path)
+                        open_workfile(workfile_path)
+                        ayon_resolve.api.save_file(workfile_path)
+                        log.info(f"Successfully created workfile from template: {workfile_path}")
+                    except Exception as e:
+                        log.error(f"Failed to create workfile from template: {e}")
+                else:
+                    log.warning(f"Template path does not exist or is empty: {template_path}")
 
     # Gathered project settings
     from ayon_core.settings import get_project_settings

@@ -1,0 +1,12 @@
+.env
+scripts/processed/
+.idea
+.idea/
+kitsu_ingest/processed/
+processed/
+.venv/
+.conda/
+__pycache__/
+kitsu_ingest/__pycache__/
+# Ignore Python cache files
+*.pyc
