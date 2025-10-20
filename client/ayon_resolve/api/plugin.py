@@ -798,6 +798,41 @@ def get_editorial_publish_data(
 
     return data
 
+def get_ingest_publish_data(
+    folder_path,
+    product_name,
+    version=None,
+    task=None,
+) -> dict:
+    """Get ingest publish data from context.
+
+    Args:
+        folder_path (str): Folder path where ingest package is located.
+        product_name (str): Ingest product name.
+        version (Optional[str]): Ingest product version. Defaults to None.
+        task (Optional[str]): Associated task name. Defaults to None (no task).
+
+    Returns:
+        dict: Ingest publish data.
+    """
+    data = {
+        "id": AVALON_INSTANCE_ID,
+        "family": "ingest",
+        "productType": "ingest",
+        "productName": product_name,
+        "folderPath": folder_path,
+        "active": True,
+        "publish": True,
+    }
+
+    if version:
+        data["version"] = version
+
+    if task:
+        data["task"] = task
+
+    return data
+
 
 def get_representation_files(project_name, representation):
     """

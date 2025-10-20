@@ -136,16 +136,6 @@ class LoaderPluginsModel(BaseSettingsModel):
         title="Load Media"
     )
 
-class FFmpegSettingsModel(BaseSettingsModel):
-    ffmpeg_path_win: str = SettingsField(
-        "ffmpeg_win",
-        title="Win executable path",
-    )
-    ffmpeg_path_mac: str = SettingsField(
-        "ffmpeg_mac",
-        title="Mac executable path",
-    )
-
 
 class TemplatedWorkfileModel(BaseSettingsModel):
     create_first_version: bool = SettingsField(
@@ -180,10 +170,6 @@ class ResolveSettings(BaseSettingsModel):
     load: LoaderPluginsModel = SettingsField(
         default_factory=LoaderPluginsModel,
         title="Loader plugins",
-    )
-    ffmpeg: FFmpegSettingsModel = SettingsField(
-        default_factory=FFmpegSettingsModel,
-        title="FFmpeg settings"
     )
     templated_workfile: TemplatedWorkfileModel = SettingsField(
         default_factory=TemplatedWorkfileModel,
