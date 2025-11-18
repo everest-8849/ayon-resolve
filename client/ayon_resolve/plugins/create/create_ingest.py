@@ -9,24 +9,7 @@ from ayon_resolve.api.plugin import ResolveCreator, get_ingest_publish_data
 
 from qtpy import QtWidgets
 
-_CREATE_ATTR_DEFS = [
-    EnumDef(
-        "originator",
-        label="Project originator",
-        tooltip="Project originator.",
-        items=[
-            {"value": "8849", "label": "8849"},
-            {"value": "Everest", "label": "Everest"},
-        ],
-        default="8849"
-    ),
-    BoolDef(
-        "ingest",
-        label="Ingest to Kitsu",
-        tooltip="Force publish to Kitsu.",
-        default=True,
-    )
-]
+_CREATE_ATTR_DEFS = []
 
 class CreateIngest(ResolveCreator):
     """Creator plugin for creating ingest."""
@@ -75,11 +58,6 @@ class CreateIngest(ResolveCreator):
         
         timeline_media_pool_item = lib.get_timeline_media_pool_item(current_timeline)
 
-        instance_data["creator_attributes"] = {
-            "originator": pre_create_data["originator"],
-            "ingest": pre_create_data["ingest"],
-        }
-
         tag_metadata = {
             "publish": deepcopy(instance_data),
         }
@@ -104,12 +82,6 @@ class CreateIngest(ResolveCreator):
         new_instance.transient_data["timeline_pool_item"] = (
             timeline_media_pool_item)
         print(f"Created new ingest instance: {new_instance}")
-
-        # QtWidgets.QMessageBox.information(
-        #     None,
-        #     "My Dialog", 
-        #     "Hello AYON!", 
-        # )
 
         self._add_instance_to_context(new_instance)
 

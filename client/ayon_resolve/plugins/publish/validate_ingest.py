@@ -15,7 +15,6 @@ class ValidateIngest(pyblish.api.InstancePlugin, OptionalPyblishPluginMixin):
     
     Checks that:
     - Timeline and project are available
-    - Required Kitsu environment variables are set
     - Instance data contains necessary information
     """
     order = ValidateContentsOrder
@@ -25,9 +24,8 @@ class ValidateIngest(pyblish.api.InstancePlugin, OptionalPyblishPluginMixin):
 
     def process(self, instance):
         project_manager = api.get_project_manager()
-        self.validate_resolve_context(project_manager)
-        self.validate_kitsu_environment()
-        self.validate_timeline_against_task(instance, project_manager)
+        timeline = self.validate_resolve_context(project_manager)
+        self.validate_timeline_against_task(instance, timeline)
 
         self.log.info("Ingest validation passed successfully")
 
@@ -46,26 +44,11 @@ class ValidateIngest(pyblish.api.InstancePlugin, OptionalPyblishPluginMixin):
             raise PublishXmlValidationError(
                 f"Failed to access Resolve context: {exc}"
             )
-
-    def validate_kitsu_environment(self):
-        required_vars = {
-            "KITSU_LOGIN": os.environ.get("KITSU_LOGIN"),
-            "KITSU_PASSWORD": os.environ.get("KITSU_PWD"), 
-            "KITSU_SERVER": os.environ.get("KITSU_SERVER")
-        }
         
-        missing = [name for name, value in required_vars.items() if not value]
-        
-        if missing:
-            raise PublishXmlValidationError(
-                f"Missing required Kitsu environment variables: {', '.join(missing)}"
-            )
+        return timeline
 
-    def validate_timeline_against_task(self, instance, project_manager):
+    def validate_timeline_against_task(self, instance, timeline):
         try:
-            current_project = project_manager.GetCurrentProject()
-            timeline = current_project.GetCurrentTimeline()
-            
             timeline_fps = timeline.GetSetting("timelineFrameRate")
             if not timeline_fps or timeline_fps <= 0:
                 raise PublishXmlValidationError("Invalid timeline frame rate")
