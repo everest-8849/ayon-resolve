@@ -1,3 +1,4 @@
+
 import os
 import sys
 import pyblish.api
@@ -13,6 +14,8 @@ from ayon_resolve.constants import ADDON_NAME
 
 from ayon_core.lib.vendor_bin_utils import get_ffmpeg_tool_path
 
+from studio_ingest import Ingester
+
 
 class IntegrateIngest(pyblish.api.InstancePlugin):
     label = "Integrate Ingest"
@@ -20,11 +23,44 @@ class IntegrateIngest(pyblish.api.InstancePlugin):
     families = ["ingest"]
 
     def process(self, instance):
+
+        # COPY FINAL FILES
+
+
+
+
+        # otio_file_path = None
+        # intermediate_file_path = None
+        
+        # for repre in instance.data.get("representations", []):
+        #     if repre["name"] == "otio_remap":
+        #         otio_file_path = os.path.join(repre["stagingDir"], repre["files"])
+        #     elif repre["name"] == "intermediate":
+        #         files = repre["files"]
+        #         if isinstance(files, list):
+        #             files = files[0]
+        #         intermediate_file_path = os.path.join(repre["stagingDir"], files)
+
+        # if not otio_file_path:
+        #     raise RuntimeError("Missing OTIO file representation ('otio_remap')")
+        # if not intermediate_file_path:
+        #     raise RuntimeError("Missing intermediate video file representation ('intermediate')")
+
+        # self.log.info(f"Ingesting OTIO: {otio_file_path}")
+        # self.log.info(f"Ingesting Video: {intermediate_file_path}")
+
+        # ingester = Ingester(
+        #     otio=otio_file_path,
+        #     intermediate=intermediate_file_path,
+        #     project_name=instance.context.data["projectName"]
+        # )
+        # ingester.run()
+
         
         # kitsu_config = instance.data.get("kitsuConfig")
         # ingest_args = instance.data.get("ingestArgs")
         # otio_file_path = instance.data.get("otioFilePath")
-        # video_file_path = instance.data["videoFilePath"]
+        # intermediate = instance.data["videoFilePath"]
         # project_name = instance.context.data["projectName"]
 
         # if not all([kitsu_config, ingest_args, otio_file_path, video_file_path, project_name]):
@@ -78,3 +114,4 @@ class IntegrateIngest(pyblish.api.InstancePlugin):
         #     raise RuntimeError(f"Failed to import Kitsu ingest modules: {exc}")
         # except Exception as exc:
         #     raise RuntimeError(f"Kitsu ingest workflow failed: {exc}")
+        

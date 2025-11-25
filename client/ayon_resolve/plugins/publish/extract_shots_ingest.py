@@ -1,14 +1,9 @@
 import os
 from pathlib import Path
-import subprocess
-
-import pyblish.api
 import opentimelineio as otio
-import ffmpeg
-
 from ayon_core.pipeline import publish
-import ayon_api
 from studio_ingest import Ingester
+import pyblish.api
 
 
 class ExtractShotsIngest(publish.Extractor):
@@ -21,37 +16,36 @@ class ExtractShotsIngest(publish.Extractor):
     families = ["ingest"]
 
     def process(self, instance):
-        otio_remap_repre = ayon_api.get_representation_by_name(
-            instance.data["representations"], "otio_remap"
+        otio_file_path = None
+        intermediate_file_path = None
+
+        for repre in instance.data.get("representations", []):
+            if repre["name"] == "otio_remap":
+                otio_file_path = os.path.join(repre["stagingDir"], repre["files"])
+            elif repre["name"] == "intermediate":
+                files = repre["files"]
+                if isinstance(files, list):
+                    files = files[0]
+                intermediate_file_path = os.path.join(repre["stagingDir"], files)
+
+        if not otio_file_path:
+            raise RuntimeError("Missing OTIO file representation ('otio_remap')")
+        if not intermediate_file_path:
+            raise RuntimeError("Missing intermediate video file representation ('intermediate')")
+
+        self.log.info(f"Ingesting OTIO: {otio_file_path}")
+        self.log.info(f"Ingesting Video: {intermediate_file_path}")
+
+        staging_dir = Path(otio_file_path).parent
+
+        ingester = Ingester(
+            metadata=otio_file_path,
+            intermediate=intermediate_file_path,
+            project_name=instance.context.data["projectName"],
+            staging_dir=staging_dir,
+            log=self.log,
         )
-        intermediate_repre = ayon_api.get_representation_by_name(
-            instance.data["representations"], "intermediate"
-        )
-
-        if not otio_remap_repre:
-            raise ValueError(
-                "No 'otio_remap' representation found on instance.")
-        if not intermediate_repre:
-            raise ValueError(
-                "No 'intermediate' representation found on instance.")
-
-        staging_dir = Path(otio_remap_repre["stagingDir"])
-        otio_remap_file = staging_dir / otio_remap_repre["files"]
-
-        intermediate_staging_dir = Path(intermediate_repre["stagingDir"])
-        intermediate_video_file = (
-            intermediate_staging_dir / intermediate_repre["files"]
-        )
-
-        if not otio_remap_file.exists():
-            raise FileNotFoundError(
-                f"OTIO remap file not found: {otio_remap_file}")
-
-        if not intermediate_video_file.exists():
-            raise FileNotFoundError(
-                f"Intermediate video file not found: {intermediate_video_file}")
-
-        ingester = Ingester(otio_remap_file, intermediate_video_file, self.log)
+        ingester.run()
 
         # self.log.info(f"Reading OTIO file: {otio_remap_file}")
         # otio_timeline = otio.adapters.read_from_file(
