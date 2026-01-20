@@ -4,8 +4,8 @@ import sys
 import pyblish.api
 
 from ayon_core.pipeline import publish
-from ayon_resolve.api.kitsu_ingest.kitsu_ingest.config.config import get_settings
-from ayon_resolve.api.kitsu_ingest.kitsu_ingest.core import Workflow
+# from ayon_resolve.api.kitsu_ingest.kitsu_ingest.config.config import get_settings
+# from ayon_resolve.api.kitsu_ingest.kitsu_ingest.core import Workflow
 
 # from ayon_api import get_addon_settings
 
@@ -23,6 +23,8 @@ class IntegrateIngest(pyblish.api.InstancePlugin):
     families = ["ingest"]
 
     def process(self, instance):
+        pass
+
 
         # COPY FINAL FILES
 
